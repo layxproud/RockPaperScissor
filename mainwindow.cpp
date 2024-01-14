@@ -3,7 +3,6 @@
 #include "game.h"
 #include "statsdialog.h"
 #include <QRandomGenerator>
-#include <QDebug>
 
 extern Game *game;
 
@@ -37,26 +36,40 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::displayResults(int result)
+{
+    QPalette palette = ui->gameResult->palette();
+
+    switch (result) {
+    case 0:
+        palette.setColor(ui->gameResult->foregroundRole(), Qt::darkYellow);
+        ui->gameResult->setPalette(palette);
+        ui->gameResult->setText("НИЧЬЯ");
+        break;
+    case 1:
+        palette.setColor(ui->gameResult->foregroundRole(), Qt::darkGreen);
+        ui->gameResult->setPalette(palette);
+        ui->gameResult->setText("ПОБЕДА");
+        break;
+    case 2:
+        palette.setColor(ui->gameResult->foregroundRole(), Qt::darkRed);
+        ui->gameResult->setPalette(palette);
+        ui->gameResult->setText("ПОРАЖЕНИЕ");
+        break;
+    default:
+        break;
+    }
+}
+
 void MainWindow::onMakeMoveButtonClicked()
 {
     int playerMove = ui->selectMoveCombo->currentIndex();
     playerView->showImage(playerMove);
     int opponentMove = QRandomGenerator::global()->generate() % 3;
     opponentView->showImage(opponentMove);
+
     int result = game->determineWinner(playerMove, opponentMove);
-    switch (result) {
-    case 0:
-        ui->gameResult->setText("НИЧЬЯ");
-        break;
-    case 1:
-        ui->gameResult->setText("ПОБЕДА");
-        break;
-    case 2:
-        ui->gameResult->setText("ПОРАЖЕНИЕ");
-        break;
-    default:
-        break;
-    }
+    displayResults(result);
 }
 
 void MainWindow::onStatsActionTriggered()
